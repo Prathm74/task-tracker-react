@@ -1,9 +1,14 @@
 Task Tracker – React + TypeScript
 
-A production-ready Task Tracker application built using React 18, TypeScript, and modern frontend tooling, demonstrating clean architecture, state management, form handling, optimistic updates, and testing best practices.
+A production-ready Task Tracker application built using React 18 and TypeScript, showcasing clean architecture, modern state management, form validation, optimistic UI updates, and testing best practices.
+
+Live Demo
+
+React Application:
+https://task-tracker-react-ruddy.vercel.app/
 
 Features
-1. Core Functionality
+1️. Core Functionality
 
 CRUD Tasks (Create, Read, Update, Delete)
 
@@ -17,15 +22,15 @@ Client-side pagination
 
 Empty state handling with clear call-to-action
 
-2. Authentication
+2️. Authentication
 
 Mock login system
 
 Protected routes using React Router
 
-Auth state persisted via LocalStorage
+Authentication state persisted via LocalStorage
 
-3. UX & Performance
+3️. UX & Performance
 
 Optimistic UI updates with rollback on failure
 
@@ -33,11 +38,13 @@ User-friendly error handling
 
 Clean UX flow (form-focused editing)
 
+Smooth transitions and loading states
+
 Reusable and scalable component design
 
-4. Quality & Reliability
+4️. Quality & Reliability
 
-Unit and integration tests using Vitest + React Testing Library
+Unit & integration tests using Vitest + React Testing Library
 
 Async-safe testing with user-event
 
@@ -55,7 +62,6 @@ Testing	Vitest, React Testing Library
 Persistence	LocalStorage (Mock API)
 
 Project Folder Structure
-
 src/
 ├─ app/
 │  └─ router.tsx
@@ -80,15 +86,21 @@ src/
 │  └─ TaskList.test.tsx
 └─ main.tsx
 
-Login Credentials
+Login Credentials (Mock)
 Username: admin
 Password: admin
 
 Getting Started
 1️. Install Dependencies
 npm install
-2. Run Development Server
+
+2️. Run Development Server
 npm run dev
+
+
+App will be available at:
+
+http://localhost:5173
 
 Running Tests
 npm run test
