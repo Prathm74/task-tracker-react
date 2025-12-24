@@ -1,3 +1,5 @@
+import { createBrowserRouter, useOutletContext } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   Box,
@@ -8,19 +10,28 @@ import {
   Divider,
   Typography,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
-import AppHeader from '@/shared/ui/AppHeader'
+
+import LoginPage from '@/pages/LoginPage'
+import NotFoundPage from '@/pages/NotFoundPage'
+import ProtectedRoute from '@/auth/ProtectedRoute'
+
 import TaskForm from '@/tasks/components/TaskForm'
 import TaskList from '@/tasks/components/TaskList'
 import { useTaskStore } from '@/tasks/useTaskStore'
 import { Task } from '@/tasks/taskTypes'
+import AppHeader from '@/shared/ui/AppHeader'
 
+/* =======================
+   THEME CONTEXT TYPE
+======================= */
 type ThemeContext = {
   darkMode: boolean
   toggleTheme: () => void
 }
 
+/* =======================
+   DASHBOARD
+======================= */
 const Dashboard = () => {
   const { darkMode, toggleTheme } =
     useOutletContext<ThemeContext>()
@@ -58,9 +69,13 @@ const Dashboard = () => {
         onToggleTheme={toggleTheme}
       />
 
-      <Box p={3} maxWidth="1000px" mx="auto">
+      <Box p={3} maxWidth="900px" mx="auto">
         {error && (
-          <Alert severity="error" onClose={clearError}>
+          <Alert
+            severity="error"
+            onClose={clearError}
+            sx={{ mb: 2 }}
+          >
             {error}
           </Alert>
         )}
@@ -75,7 +90,14 @@ const Dashboard = () => {
 
         <Divider sx={{ mb: 2 }} />
 
-        <TaskList onEdit={handleEdit} />
+        {/* TASK TABLE */}
+        {tasks.length > 0 ? (
+          <TaskList onEdit={handleEdit} />
+        ) : (
+          <Typography color="text.secondary">
+            No tasks available. Click "Add Task" to create your first task.
+          </Typography>
+        )}
 
         {/* ADD / EDIT POPUP */}
         <Dialog open={open} onClose={handleClose} fullWidth>
@@ -94,3 +116,26 @@ const Dashboard = () => {
     </>
   )
 }
+
+/* =======================
+   ROUTER CONFIG
+======================= */
+export const createAppRouter = (
+  darkMode: boolean,
+  toggleTheme: () => void
+) =>
+  createBrowserRouter([
+    { path: '/login', element: <LoginPage /> },
+
+    {
+      element: (
+        <ProtectedRoute
+          darkMode={darkMode}
+          toggleTheme={toggleTheme}
+        />
+      ),
+      children: [{ path: '/', element: <Dashboard /> }],
+    },
+
+    { path: '*', element: <NotFoundPage /> },
+  ])
