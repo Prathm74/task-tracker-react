@@ -1,198 +1,99 @@
 import {
-  Box,
-  Card,
-  CardContent,
   IconButton,
-  MenuItem,
-  Pagination,
-  Select,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
   Typography,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { useMemo, useState } from 'react'
 import { useTaskStore } from '../useTaskStore'
+import { Task } from '../taskTypes'
 import StatusPill from './StatusPill'
-import { Task, TaskStatus } from '../taskTypes'
-import { Skeleton } from '@mui/material'
-
 
 type Props = {
   onEdit: (task: Task) => void
 }
 
-const PAGE_SIZES = [5, 10, 20]
-
 export default function TaskList({ onEdit }: Props) {
   const { tasks, deleteTask, loading } = useTaskStore()
-
-  const [statusFilter, setStatusFilter] =
-    useState<TaskStatus | 'all'>('all')
-
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
+  const [search, setSearch] = useState('')
 
   const filteredTasks = useMemo(() => {
-    let list = [...tasks]
-
-    if (statusFilter !== 'all') {
-      list = list.filter((t) => t.status === statusFilter)
-    }
-
-    const priorityOrder = { High: 3, Medium: 2, Low: 1 }
-    list.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
-
-    return list
-  }, [tasks, statusFilter])
-
-  const totalPages = Math.ceil(filteredTasks.length / pageSize)
-
-  const paginatedTasks = useMemo(() => {
-    const start = (page - 1) * pageSize
-    return filteredTasks.slice(start, start + pageSize)
-  }, [filteredTasks, page, pageSize])
-
-  const handleFilterChange = (value: TaskStatus | 'all') => {
-    setStatusFilter(value)
-    setPage(1)
-  }
-
-  const handlePageSizeChange = (value: number) => {
-    setPageSize(value)
-    setPage(1)
-  }
+    return tasks.filter((t) =>
+      t.title.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [tasks, search])
 
   if (loading) {
-  return (
-    <Stack spacing={2}>
-      {[1, 2, 3].map((i) => (
-        <Card
-          key={i}
-          sx={{
-            filter: 'blur(1px)',
-            opacity: 0.6,
-          }}
-        >
-          <CardContent>
-            <Skeleton variant="text" width="60%" />
-            <Skeleton variant="text" width="90%" />
-            <Skeleton variant="text" width="40%" />
-          </CardContent>
-        </Card>
-      ))}
-    </Stack>
-  )
-}
-
+    return <Typography>Loading tasks...</Typography>
+  }
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" spacing={2}>
-        <Select
-          size="small"
-          value={statusFilter}
-          onChange={(e) =>
-            handleFilterChange(
-              e.target.value as TaskStatus | 'all'
-            )
-          }
-          sx={{ width: 160 }}
-        >
-          <MenuItem value="all">All</MenuItem>
-          <MenuItem value="todo">Todo</MenuItem>
-          <MenuItem value="in_progress">In Progress</MenuItem>
-          <MenuItem value="done">Done</MenuItem>
-        </Select>
+      <TextField
+        label="Search by title"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        size="small"
+      />
 
-        <Select
-          size="small"
-          value={pageSize}
-          onChange={(e) =>
-            handlePageSizeChange(Number(e.target.value))
-          }
-          sx={{ width: 120 }}
-        >
-          {PAGE_SIZES.map((size) => (
-            <MenuItem key={size} value={size}>
-              {size} / page
-            </MenuItem>
-          ))}
-        </Select>
-      </Stack>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Priority</TableCell>
+            <TableCell>Due Date</TableCell>
+            <TableCell align="right">Actions</TableCell>
+          </TableRow>
+        </TableHead>
 
-      {paginatedTasks.map((task) => (
-        <Card
-          key={task.id}
-          sx={{
-            transition: '0.2s',
-            '&:hover': {
-              boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-            },
-          }}
-        >
-          <CardContent>
-            <Stack direction="row" justifyContent="space-between">
-              <Box>
-                <Typography variant="h6">
-                  {task.title}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {task.description || '—'}
-                </Typography>
-
-                <Stack direction="row" spacing={1} mt={1}>
-                  <StatusPill status={task.status} />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 500,
-                      color:
-                        task.priority === 'High'
-                          ? 'error.main'
-                          : task.priority === 'Medium'
-                            ? 'warning.main'
-                            : 'success.main',
-                    }}
-                  >
-                    Priority: {task.priority}
-                  </Typography>
-                </Stack>
-              </Box>
-
-              <Stack direction="row">
+        <TableBody>
+          {filteredTasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell>{task.title}</TableCell>
+              <TableCell>
+                <StatusPill status={task.status} />
+              </TableCell>
+              <TableCell>{task.priority}</TableCell>
+              <TableCell>
+                {task.dueDate
+                  ? new Date(task.dueDate).toLocaleDateString()
+                  : '—'}
+              </TableCell>
+              <TableCell align="right">
                 <IconButton
                   onClick={() => onEdit(task)}
                 >
                   <EditIcon />
                 </IconButton>
-
                 <IconButton
-                  onClick={() => deleteTask(task.id)}
                   color="error"
+                  onClick={() => deleteTask(task.id)}
                 >
                   <DeleteIcon />
                 </IconButton>
-              </Stack>
-            </Stack>
-          </CardContent>
-        </Card>
-      ))}
+              </TableCell>
+            </TableRow>
+          ))}
 
-      {totalPages > 1 && (
-        <Stack alignItems="center" mt={2}>
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_, value) => setPage(value)}
-            color="primary"
-          />
-        </Stack>
-      )}
+          {!filteredTasks.length && (
+            <TableRow>
+              <TableCell colSpan={5}>
+                <Typography align="center">
+                  No tasks found
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </Stack>
   )
 }
