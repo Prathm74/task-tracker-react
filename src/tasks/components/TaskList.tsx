@@ -36,6 +36,7 @@ export default function TaskList({ onEdit }: Props) {
 
   return (
     <Stack spacing={2}>
+      {/* TITLE FILTER */}
       <TextField
         label="Search by title"
         value={search}
@@ -43,6 +44,7 @@ export default function TaskList({ onEdit }: Props) {
         size="small"
       />
 
+      {/* TABLE */}
       <Table>
         <TableHead>
           <TableRow>
