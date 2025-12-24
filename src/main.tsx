@@ -5,7 +5,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import { RouterProvider } from 'react-router-dom'
 
 import { getTheme } from '@/app/theme'
-import { createAppRouter } from '@/app/router'
+import { createAppRouter } from './app/router'
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(false)
